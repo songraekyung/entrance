@@ -11,11 +11,12 @@
 <body>
     <style>
         .alert {
-            padding: 20px;
+            padding: 10px;
             background-color: #f44336; /* Red */
             color: white;
             margin-bottom: 15px;
             display: none;
+            margin-top: 15px;
         }
 
         /* The close button */
@@ -34,6 +35,9 @@
         .closebtn:hover {
             color: black;
         }
+        .btn-default{
+            margin-top: 15px;
+        }
     </style>
 
     <div class="container">
@@ -46,8 +50,10 @@
         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
         <p class="msg"></p>
     </div>
-    <div class="history">
-        <p class="msg"> Ban vua rut: {!!  !!}</p>
+    <button type="button" class="btn btn-default" onclick="showHistory()">Show History</button>
+    <div class="msg-history" style="display: none; ">
+        <h3 class="msg-history"> Ban vua rut: </h3>
+        <div id="show-table"></div>
     </div>
 
 
@@ -55,11 +61,7 @@
 </html>
 <script>
     function getPrice(price, amounts) {
-        let amountNew = null;
-        if (amountNew !== null)
-        {
-            amounts = amountNew;
-        }
+
         $.ajax({
             url: '/exercise-amounts',
             type:'POST',
@@ -68,11 +70,27 @@
             success:function(data){
                 console.log(data);
                 if (data.status !== 400) {
-                    $('#change-price').text(data.amountNew);
+                    location.reload();
                 } else {
                     $(".alert").show();
                     $(".msg").text(data.msg);
                 }
+
+
+            }
+
+        });
+
+    }
+    function showHistory() {
+
+        $.ajax({
+            url: '/exercise-show-history',
+            type:'GET',
+            async:false,
+            success:function(data){
+                $(".msg-history").show();
+                $("#show-table").append(data.zone);
 
 
             }

@@ -18,3 +18,6 @@ Route::get('/exercise-one', 'ExerciseController@exerciseOne');
 Route::get('/exercise-two', 'ExerciseController@exerciseTwo');
 Route::get('/exercise-three', 'ExerciseController@exerciseThree');
 Route::post('/exercise-amounts', 'ExerciseController@exerciseAmounts');
+Route::get('/exercise-show-history', 'ExerciseController@exerciseHistory');
+Route::get('/exercise-four', 'ExerciseController@exerciseFour');
+Route::post('/exercise-four/add-menu', 'ExerciseController@addMenu');

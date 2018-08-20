@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Price;
-use DB;
+use App\UserInfo;
+use App\Menu;
+use Illuminate\Support\Facades\Hash;
 class ExerciseController extends Controller
 {
     /**
@@ -12,23 +14,17 @@ class ExerciseController extends Controller
      */
     public function exerciseOne()
     {
-
-        echo phpinfo();die;
-
-        $x = DB::table('amounts')->get();
-        dd($x);
-
         $arrLargetNumber = array(0, 6, 100, 46, 47);
-        $max1 = max($arrLargetNumber);
+        $largetNumber = max($arrLargetNumber);
         $currentMax = NULL;
         foreach ($arrLargetNumber as $key => $value) {
-            if ($value >= $currentMax && $value !== $max1) {
+            if ($value >= $currentMax && $value !== $largetNumber) {
                 $currentMax = $value;
             }
         }
-        echo $max1; echo $currentMax; die;
+        $arrNews = implode( ", ", $arrLargetNumber );
+        return view('exercise-one')->with(compact ('largetNumber', 'currentMax', 'arrNews'));
 
-        return view('exercise-one');
 
     }
     public function exerciseTwo()
@@ -41,16 +37,23 @@ class ExerciseController extends Controller
                 $uniqueNumbers[] = $number;
             }
         }
+        $arrNews = implode( ", ", $arrRepeat );
+        return view('exercise-two')->with(compact ( 'uniqueNumbers', 'arrNews'));
 
-        dd($uniqueNumbers);
 
     }
-    public function exerciseThree($amounts = 2018)
+    public function exerciseThree()
     {
-        $sql=Price::all();
-        dd($sql);
-        $price = array(1, 5, 10, 50);
-        return view('exercise-three')->with(compact('amounts', 'price'));
+
+        $sql = UserInfo::first();
+        if ($sql)
+        {
+            $amounts = $sql->amounts;
+            $price = array(1, 5, 10, 50);
+            return view('exercise-three')->with(compact('amounts', 'price'));
+        }
+        return "Errors connect to server";
+
     }
     public function exerciseAmounts(Request $request)
     {
@@ -64,10 +67,52 @@ class ExerciseController extends Controller
             {
                 return response()->json(['msg'=> 'Your account balance is not sufficient to perform a transaction', 'status' => 400]);
             }
-            return response()->json(['msg'=>'Successful transaction', 'amountNew'=> $amountNew, 'status' => 200 ]);
+            $sqlUpdateAmount = UserInfo::where('email', 'nguyendinhchien.cit@gmail.com')->update(['amounts' => $amountNew]);
+            $sqlHistoryPrice = new Price();
+            $sqlHistoryPrice->user_id = 1;
+            $sqlHistoryPrice->amounts = $amounts;
+            $sqlHistoryPrice->amounts_news = $amountNew;
+            $sqlHistoryPrice->price = $price;
+            $resSql = $sqlHistoryPrice->save();
+            if ($resSql)
+            {
+                return response()->json(['msg'=>'Successful transaction', 'amountNew'=> $amountNew, 'status' => 200 ]);
+            }
+            return "Errors connect to server";
         }
-        else{
+        else
+        {
             return "not found";
         }
+    }
+    public function exerciseHistory()
+    {
+        $sql = Price::where('user_id', 1)->get()->toArray();
+        if($sql)
+        {
+            $zone          = view('ajax-history', compact('sql'))->render();
+            return response()->json(compact('zone'));
+
+        }
+        return "Errors connect to server";
+
+    }
+    public function exerciseFour()
+    {
+        $menuSql = Menu::get()->toArray();
+        return view('exercise-four')->with(compact('menuSql'));
+    }
+    public function addMenu(Request $request)
+    {
+        $request = $request->all();
+        if($request)
+        {
+            $sqlMenu = new Menu();
+            $sqlMenu->name_menu = $request['name_menu'];
+            $sqlMenu->parent = $request['choose-menu'];
+            $sqlMenu->save();
+        }
+
+        return back();
     }
 }

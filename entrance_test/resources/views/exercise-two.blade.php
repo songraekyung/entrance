@@ -12,9 +12,11 @@
 
 
 <div class="container">
-    <h2>The top 2 largest numbers of an array [{!! $arrNews !!}]: </h2>
-    <h3>{!! $largetNumber !!}</h3>
-    <h3>{!! $currentMax !!}</h3>
+    <h2>Number that repeats 1 time in this array [{!! $arrNews !!}]. </h2>
+    @foreach ($uniqueNumbers as $key => $value)
+        <h3>{!! $value !!}</h3>
+    @endforeach
+
 </div>
 
 
